@@ -9,9 +9,9 @@
 #include <regex>
 
 Shader::Shader():
-m_program(0), 
-m_fragmentShader(0),m_vertexShader(0), 
-m_nBuffers(0), 
+m_program(0),
+m_fragmentShader(0),m_vertexShader(0),
+m_nBuffers(0),
 m_time(false), m_delta(false), m_date(false), m_mouse(false), m_mouse4(false), m_view2d(false), m_view3d(false), m_background(false) {
 }
 
@@ -50,7 +50,7 @@ bool find_id(const std::string& program, const char* id) {
     return std::strstr(program.c_str(), id) != 0;
 }
 
-// TODO: 
+// TODO:
 //      - this can be done in a more elegant way
 //
 
@@ -160,13 +160,13 @@ bool Shader::load(const std::string& _fragmentSrc, const std::string& _vertexSrc
 
         // u_time
         m_time = find_id(_fragmentSrc, "u_time") || find_id(_vertexSrc, "u_time");
-        
+
         // u_delta
         m_delta = find_id(_fragmentSrc, "u_delta") || find_id(_vertexSrc, "u_delta");
-        
+
         // u_data
         m_date = find_id(_fragmentSrc, "u_date") || find_id(_vertexSrc, "u_date");
-        
+
         /// u_mouse as vec4
         m_mouse4 = find_id(_fragmentSrc, "vec4 u_mouse") || find_id(_vertexSrc, "vec4 u_mouse");
 
@@ -210,7 +210,7 @@ bool Shader::load(const std::string& _fragmentSrc, const std::string& _vertexSrc
         }
         glDeleteProgram(m_program);
         return false;
-    } 
+    }
     else {
         glDeleteShader(m_vertexShader);
         glDeleteShader(m_fragmentShader);
@@ -268,11 +268,12 @@ GLuint Shader::compileShader(const std::string& _src, const std::vector<std::str
             "uniform vec2 u_resolution;\n"
             "#define iResolution vec3(u_resolution, 1.0)\n"
             "\n";
-        m_time = find_id(_src, "iGlobalTime");
+        m_time = find_id(_src, "iGlobalTime") || find_id(_src, "iTime");
         if (m_time) {
             prolog +=
                 "uniform float u_time;\n"
                 "#define iGlobalTime u_time\n"
+                "#define iTime u_time\n"
                 "\n";
         }
         m_delta = find_id(_src, "iTimeDelta");
@@ -320,7 +321,7 @@ GLuint Shader::compileShader(const std::string& _src, const std::vector<std::str
 
     GLint infoLength = 0;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLength);
-    
+
 #ifdef PLATFORM_RPI
     if (infoLength > 1 && !isCompiled) {
 #else
